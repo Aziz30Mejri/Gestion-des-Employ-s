@@ -14,6 +14,7 @@ root.configure(bg='#2c3e50')
 
 nom = StringVar()
 age = StringVar()
+#age = IntVar()
 emploi = StringVar()
 genre = StringVar()
 email = StringVar()
@@ -39,8 +40,8 @@ comboGenre['values'] = ("Mâle","Féminin")
 comboGenre.place(x=120, y=130)
 lblAge = Label(entries_frame, text='Âge', font=('Calibri', 16), bg='#2c3e50', fg='white')
 lblAge.place(x=10, y=170)
-txtAge = Entry(entries_frame, textvariable=age, width=20, font=('Calibri', 16))
-txtAge.place(x=120, y=170)
+spinAge = Spinbox(entries_frame, from_=18, to=50, textvariable=age, width=18, font=('Calibri', 16))
+spinAge.place(x=120, y=170)
 lblEmail = Label(entries_frame, text='Email', font=('Calibri', 16), bg='#2c3e50', fg='white')
 lblEmail.place(x=10, y=210)
 txtEmail = Entry(entries_frame, textvariable=email, width=20, font=('Calibri', 16))
@@ -85,7 +86,8 @@ def getData(event):
 
 def update():
     nom_value = txtNom.get().strip()
-    age_value = txtAge.get().strip()
+    age_value = age.get().strip()
+    #age_value = age.get()
     emploi_value = txtEmploi.get().strip()
     email_value = txtEmail.get().strip()
     genre_value = comboGenre.get().strip()
@@ -105,8 +107,8 @@ def update():
     if not emploi_value.isalpha():
         messagebox.showerror("Erreur", "L'emploi ne doit contenir que des caractères alphabétiques")
         return
-    if not re.match(r'^\d{1,2}$', age_value):
-        messagebox.showerror("Erreur", "L'âge doit comporter au maximum 2 chiffres")
+    if not (age_value.isdigit() and 18 <= int(age_value) <= 50):
+        messagebox.showerror("Erreur", "Veuillez entrer âge validé ")
         return
     if not re.match(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$', email_value):
         messagebox.showerror("Erreur", "Veuillez entrer une adresse email valide")
@@ -116,15 +118,15 @@ def update():
         return
     try:
         db.update(
-                  row[0],
-                  nom_value,
-                  age_value,
-                  emploi_value,
-                  email_value,
-                  genre_value,
-                  mobile_value,
-                  adresse_value
-                  )
+            row[0],
+            nom_value,
+            int(age_value),
+            emploi_value,
+            email_value,
+            genre_value,
+            mobile_value,
+            adresse_value
+        )
         messagebox.showinfo('Succès', 'Les données des employés sont mises à jour')
         Clear()
         displayAll()
@@ -161,7 +163,8 @@ def displayAll():
 
 def add_employee():
     nom_value = txtNom.get().strip()
-    age_value = txtAge.get().strip()
+    age_value = age.get().strip()
+    #age_value = age.get()
     emploi_value = txtEmploi.get().strip()
     email_value = txtEmail.get().strip()
     genre_value = comboGenre.get().strip()
@@ -177,8 +180,8 @@ def add_employee():
     if not emploi_value.isalpha():
         messagebox.showerror("Erreur", "L'emploi  ne doit contenir que des caractères alphabétiques")
         return
-    if not re.match(r'^\d{1,2}$', age_value):
-        messagebox.showerror("Erreur", "Vérifier le champ de l'age")
+    if not (age_value.isdigit() and 18 <= int(age_value) <= 50):
+        messagebox.showerror("Erreur", "Veuillez entrer âge validé")
         return
     if not re.match(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$', email_value):
         messagebox.showerror("Erreur", "Veuillez entrer une adresse email valide")
@@ -189,7 +192,8 @@ def add_employee():
     try:
         db.insert(
             nom_value,
-            age_value,
+            int(age_value),
+            #age_value,
             emploi_value,
             email_value,
             genre_value,
@@ -241,7 +245,7 @@ btnDelete = Button(btn_frame,
                 ).place(x=170,y=5)
 
 btnClear = Button(btn_frame,
-                text='Claire Détails',
+                text='Effacer Détails',
                 width=14,
                 height=1,
                 font=('Calibri',16),
@@ -278,6 +282,7 @@ tv.column("8", width="150", anchor='center')
 tv['show'] = 'headings'
 tv.bind("<ButtonRelease-1>", getData)
 tv.place(x=1, y=1, height=610, width=875)
+root.after(0, lambda: age.set(""))
 
 displayAll()
 root.mainloop()
